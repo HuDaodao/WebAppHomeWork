@@ -1,0 +1,10 @@
+F:\练习\作业\WebAppHomeWork\Model\bin\Debug\Model.dll
+F:\练习\作业\WebAppHomeWork\Model\bin\Debug\Model.pdb
+F:\练习\作业\WebAppHomeWork\Model\obj\Debug\Model.dll
+F:\练习\作业\WebAppHomeWork\Model\obj\Debug\Model.pdb
+F:\练习\作业\WebAppHomeWork\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+C:\Users\Administrator.PC-201611092154\Desktop\WebAppHomeWork\Model\bin\Debug\Model.dll
+C:\Users\Administrator.PC-201611092154\Desktop\WebAppHomeWork\Model\bin\Debug\Model.pdb
+C:\Users\Administrator.PC-201611092154\Desktop\WebAppHomeWork\Model\obj\Debug\Model.csprojResolveAssemblyReference.cache
+C:\Users\Administrator.PC-201611092154\Desktop\WebAppHomeWork\Model\obj\Debug\Model.dll
+C:\Users\Administrator.PC-201611092154\Desktop\WebAppHomeWork\Model\obj\Debug\Model.pdb

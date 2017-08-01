@@ -1,0 +1,171 @@
+﻿@using WebAppHomeWork.ViewModel
+@model EmployeeViewModel
+
+@{
+    Layout = "~/Views/Shared/MyLayout.cshtml"; ;
+}
+
+
+
+@section TitleSection{
+       AddEmployee
+    }
+    
+@section ContentBody{
+        @using (Html.BeginForm("SaveEmployee", "Employee", FormMethod.Post,new{id= "commentForm" }))
+        {
+            <div class="form-horizontal">
+                <h3>员工信息</h3>
+                @Html.HiddenFor(model=>model.Id)
+                <div class="form-group">
+                    <div class="col-md-1">
+                        @Html.DisplayNameFor(model => model.EmployeeName)
+                    </div>
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.EmployeeName, new { htmlAttributes = new { @class = "form-control", required = true, maxlength = 50} })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.EmployeeName)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-1">
+                    @Html.DisplayNameFor(model => model.PassWord)
+                    </div>
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.PassWord, new {htmlAttributes = new {@class = "form-control", required = true, maxlength = 50, minlength = "3" } })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.PassWord)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-1">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </div>
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", type = "email", maxlength=100 } })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.Email)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-1">
+                        @Html.DisplayNameFor(model => model.Age)
+                    </div>
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control", type = "number" ,max=110,min=15} })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.Age)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-md-1">
+                        @Html.DisplayNameFor(model => model.DepartmentId)
+                    </div>
+                    <div class="col-md-4">
+                        @Html.DropDownList("DepartmentId", null, "--请选择--", new { @class = "form-control", onselect = "false" })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.DepartmentId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-1 col-md-3">
+                        <input type="submit" value="保存" name="BtnSubmit" class="btn btn-default" />
+                        <input type="button" id="Clear" value="清空" name="BtnSubmit" class="btn btn-default" />
+                        <input type="button" value="返回" name="BtnSubmit" class="btn btn-default" onclick="window.location.href='Index'" />
+                    </div>
+                </div>
+            </div>
+        }
+}
+
+@section HeaderSection{
+    <script type="text/javascript">
+        //$.validator.setDefaults({
+        //    submitHandler: function() {
+        //        alert("提交事件!");
+        //    }
+        //});
+
+        $(function() {
+            MyValiData();
+            $("#Clear").click(function() {
+                $("#EmployeeName,#PassWord,#Email").val("");
+                $("#Age").val(0);
+            });
+        });
+
+        //自定义验证
+        function MyValiData() {
+            $("#commentForm").validate({
+                rules: {
+                    EmployeeName: {
+                        required: true,
+                        maxlength: 50,
+                        remote: {
+                            url: "/Employee/CheckName",
+                            type: "post",
+                            datatype: "json",
+                            data: {
+                                empName:function() {
+                                    return $("#EmployeeName").val();
+                                },
+                                id:function() {
+                                    return $("#Id").val();
+                                } 
+                            }
+                        }
+                    },
+                    PassWord: {
+                        required: true,
+                        maxlength: 50,
+                        minlength: 3
+                    },
+                    Age: {
+                        max: 110,
+                        min: 15
+                    },
+                    Email: {
+                        email: true,
+                        maxlength: 100
+                    }
+                },
+                messages: {
+                    EmployeeName: {
+                        required: "我还不知道你的名字！",
+                        maxlength: "名字不能超过50个字",
+                        remote: "这个名字已经有人用过了"
+                    },
+                    PassWord: {
+                        required: "你密码没填！",
+                        maxlength: "密码不能超过50字",
+                        minlength: "密码长度不能小于 3 个字"
+                    },
+                    Age: {
+                        max: "年龄超过110岁了",
+                        min: "年龄不能小于15岁"
+                    },
+                    Email: {
+                        email: "识别不了来自火星的邮箱",
+                        maxlength: "邮箱长度不能超过100字"
+                    }
+                }
+            });
+        }
+    </script>
+
+    <style type="text/css">
+        .error {
+            color: #ff4500;
+        }
+    </style>
+}

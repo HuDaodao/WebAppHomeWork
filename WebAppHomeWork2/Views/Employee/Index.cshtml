@@ -1,0 +1,163 @@
+﻿@using WebAppHomeWork.ViewModel
+@model EmployeeListViewModel
+
+@section TitleSection{
+        MyView
+    }
+
+@section ContentBody{
+    @{
+        Html.RenderAction("GetAddNewLink");
+    }
+
+    <table id="dataTable" class="table">
+        <thead >
+        <tr>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>邮箱</th>
+            <th>是否是管理员</th>
+            <th>所属部门</th>
+            <th>Id </th>
+            <th>操作 </th>
+        </tr>
+        <thead>
+    </table>
+    }
+@section HeaderSection{
+    <link href="~/Content/jquery.dataTables.css" rel="stylesheet" />
+    @*<link href="~/Content/dataTables.bootstrap.css" rel="stylesheet" />*@
+
+    <script src="~/Scripts/jquery.dataTables.js"></script>
+    @*<script src="~/Scripts/dataTables.bootstrap.js"></script>*@
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            DataTable();
+        });
+
+        //DataTable
+        function DataTable() {
+            $("#dataTable").DataTable({
+                "bPaginate": true, //开关，是否显示分页器
+                "bSort": true, //开关，是否启用各列具有按列排序的功能
+                "bAutoWidth": true,
+                "columns": [
+                    { "data": "EmployeeName" },
+                    { "data": "Age" },
+                    { "data": "Email" },
+                    { "data": "IsAdmin" },
+                    { "data": "DepartName" },
+                    { "data": "Id"}
+                ],
+                "columnDefs": [
+                    { "visible": false , "targets": [5] },
+                    {
+                        "targets": [6],
+                        "data": "Id",
+                        "render": function (data, type, full) {//data代表了该属性的值,full表示整行对象（可以通过full.userId获得该行的其他属性值）
+                            return '<a class="delete" href="javascript:void(0);" onclick="IsAdmin(' + data + ')">修改管理员权限</a> | <a class="edit" href="AddEditEmployee?id=' + data + '">修改</a> | <a class="delete" href="javascript:void(0);" onclick="deleteFunc(' + data + ')">删除</a>';
+                         }
+                    },
+                    {
+                        "targets": [0,2,3,4,5,6], "bSortable": false
+                    }
+                ],
+                "destroy": true,
+                "bProcessing": false, //是否显示加载
+                "bServerSide": true, //开启服务器处理模式    异步请求
+                "sAjaxSource": "/Employee/DataList", //请求资源路径
+                "sDom": "Tflt<'row DTTTFooter'<'col-sm-6'i><'col-sm-6'p>>",
+                "fnServerData": function(sSource, aoData, fnCallback) {
+                    var data = {};
+                    //alert(JSON.stringify(aoData));
+                    for (var i = 0; i < aoData.length; i++) {
+                        if (aoData[i].name === "iDisplayStart") {
+                            data.PageStart = aoData[i].value;
+                        }
+                        if (aoData[i].name === "iDisplayLength") {
+                            data.PageSize = aoData[i].value;
+                        }
+                        if (aoData[i].name === "sEcho") {
+                            data.Draw = aoData[i].value;
+                        }
+                        if (aoData[i].name === "iSortCol_0") {
+                            data.SortCol = aoData[i].value;
+                        }
+                        if (aoData[i].name === "sSortDir_0") {
+                            data.SortDir = aoData[i].value;
+                        }
+                        if (aoData[i].name === "sSearch") {
+                            data.Search = aoData[i].value;
+                        }
+                    }
+                    //alert(JSON.stringify(data));
+                    $.ajax({
+                        'type': 'post',
+                        "url": sSource,
+                        "dataType": "json",
+                        "data": {
+                            "searchBase": data
+                        },
+                        "success": function(resp) {
+                            fnCallback(resp);
+                        }
+                    });
+                },
+                oLanguage: { //多语言配置
+                    "sProcessing": "正在加载中......",
+                    "sLengthMenu": "每页显示 _MENU_ 条记录",
+                    "sZeroRecords": "未查到数据！",
+                    "sEmptyTable": "表中无数据存在！",
+                    "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
+                    "sInfoFiltered": "数据表中共为 _MAX_ 条记录",
+                    "sSearchPlaceholder": "🔍 姓名", //搜索框内占位符
+                    "sSearch": "查找 ", //搜索框前的字体
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上一页",
+                        "sNext": "下一页",
+                        "sLast": "末页"
+                    }
+                }
+            });
+        }
+
+        //修改管理员状态
+        function IsAdmin(empId) {
+            $.ajax({
+                url: "IsAdmin",
+                type: "post",
+                data: { id: empId },
+                success: function(data) {
+                    if (data != null) {
+                        //$("#dataTable").dataTable().fnDestroy(); 
+                        DataTable();
+                    } else {
+                        alert("修改失败");
+                    }
+                }
+            });
+        }
+
+        //删除
+        function deleteFunc(empId) {
+            var deleteCheck = confirm("确认删除这条数据？");
+            if (deleteCheck) {
+                $.ajax({
+                    url: "Delete?id=" + empId,
+                    datatype: "json",
+                    type: "Post",
+                    success: function(data) {
+                        if (data!==null) {
+                            //$("#dataTable").dataTable().fnDestroy(); 
+                            DataTable();
+                        } else {
+                            alert("删除失败");
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

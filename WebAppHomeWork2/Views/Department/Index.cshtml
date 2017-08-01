@@ -1,0 +1,217 @@
+﻿@using WebAppHomeWork.ViewModel
+@model DepatViewModel
+
+@{
+    ViewBag.Title = "Another";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+
+@section TitleSection{
+    MyView
+}
+
+@section HeaderSection
+{
+    @Scripts.Render("~/bundles/Myjstree")
+    
+    <link href="~/themes/default/style.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(function () {
+            MyjsTree();
+        });
+
+        function MyjsTree() {
+            $("#jstree").jstree({
+                "core": {
+                    "multiple": false,
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": "",
+                    "data": {
+                        "url": "/Department/TreeList",
+                        "datatype": "json",
+                        "data": function (node, callback) {
+                            return { "id": node.id === "#" ? "0" : node.id };
+                        }
+                    }
+                },
+                "types": {
+                    "default": {
+                        "icon": "glyphicon glyphicon-flash"
+                    }
+                },
+                "callback": {
+                    onselect: function (node, tree_obj) {
+                    }
+                },
+                "state": { "key": "state_demo" },
+                "themes": {
+                    "theme": "default", 
+                    "dots": true,
+                    "icons": false
+                },
+                "plugins": ["contextmenu", "state", "types","themes"]
+            });
+        }
+
+        //新增修改
+        function AddCreate(action) {
+            var ref = $("#jstree").jstree(true);
+            sel = ref.get_selected();
+            var parentId = sel[0];
+            $("#ParentId").empty();
+
+            $.ajax({
+                url: "DropDownParent?id=" + parentId,
+                datatype: "json",
+                type: "post",
+                data: {
+                    action: action
+                },
+                success: function (data) {
+                    if (data != null) {
+                        var dropList = eval("(" + data + ")").DropList;
+                        var dept = eval("(" + data + ")").Dept;
+                        $("#ParentId").append("<option value=''>--请选择--</option>");
+                        $.each(dropList, function (index, item) {
+                            $("#ParentId").append("<option value='" + item.Id + "'>" + item.Name + "</option>");
+                        });
+                        if (action === 0) {
+                            $("#ParentId").val(parentId);
+                        } else {
+                            $("#ParentId").val(dept.ParentId);
+                            $("#Id").val(dept.Id);
+                            $("#Name").val(dept.Name);
+                            $("#Note").val(dept.Note);
+                        }
+                    }
+                }
+            });
+        };
+
+        //删除
+        function Delete() {
+            var ref = $("#jstree").jstree(true),
+                sel = ref.get_selected();
+            if (!sel.length) {
+                alert("请选择一个子节点！");
+                return false;
+            }
+            var deleteCheck = confirm("确认删除这条数据？");
+            if (deleteCheck) {
+                $.ajax({
+                    url: "Delete?id=" + sel,
+                    datatype: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data != null) {
+                            alert("删除成功！");
+                            $("#jstree").data("jstree", false).empty();
+                            MyjsTree();
+                        } else {
+                            alert("删除失败！");
+                        }
+                    }
+                });
+            }
+            return false;
+        }
+
+        //保存修改
+        function Save() {
+            $.ajax({
+                url: "Save",
+                datatype: "json",
+                type: "post",
+                data: $("form").serialize(),
+                success: function(data) {
+                    if (data != null) {
+                        alert("保存成功！");
+                        $("#closeBtn").click();
+                        $("#jstree").data("jstree", false).empty();
+                        MyjsTree();
+                    } else {
+                        alert("保存失败！");
+                    }
+                }
+            });
+        }
+    </script>
+}
+
+@section ContentBody{
+    @*按钮*@
+    <div class="row">
+        <div class="col-md-4 col-sm-8 col-xs-8">
+            <button id="creatbtn" href="#depatModel" onclick="AddCreate(0);" role="button" class="btn btn-success btn-sm" data-toggle="modal"><i class="glyphicon glyphicon-asterisk"></i> 新建部门</button>
+            <button id="creatbtn" href="#depatModel" onclick="AddCreate(1);" role="button" class="btn btn-warning btn-sm" data-toggle="modal"><i class="glyphicon glyphicon-pencil"></i> 修改部门</button>
+            <button id="creatbtn" onclick="Delete();" role="button" class="btn btn-danger btn-sm" data-toggle="modal" ><i class="glyphicon glyphicon-remove"></i> 删除部门</button>
+        </div>
+    </div>
+    
+    @* 树 *@
+    <div class="row">
+        <div class="col-md-12">
+            <div id="jstree" class="demo" style="margin-top: 1em; min-height: 200px;"></div>
+        </div>
+    </div>
+    
+    @*弹出框*@
+    <div class="row">
+        <div class="col-md-12 column">
+            <div class="modal fade" id="depatModel" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                部门信息
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Save", "Department", FormMethod.Post))
+                            {
+                                <div class="form-horizontal">
+                                    <input type="hidden" id="Id" name="Id" />
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", required = true } })
+                                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ParentId, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.DropDownList("ParentId", new List<SelectListItem>
+                                            {
+                                                (new SelectListItem() {Text="没有上级部门",Value="0",Selected=false }),
+                                            }, new { @class = "form-control", onselect = "false" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Note, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.Note, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-offset-5 col-md-10">
+                                            <button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                            <button type="button" class="btn btn-primary" onclick="Save()" >保存</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

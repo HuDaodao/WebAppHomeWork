@@ -1,0 +1,54 @@
+﻿@using WebAppHomeWork.ViewModel
+@model BaseViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@RenderSection("TitleSection")</title>
+    @Styles.Render("~/Content/css")
+
+    @Scripts.Render("~/bundles/Myjquery")
+    @RenderSection("HeaderSection",false)
+</head>
+<body>
+<div style="text-align: right; margin-right: 10px; padding: 0;" name="ContentRight" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            @Html.ActionLink("MVCHomeWork", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("主页", "Index", "Home")</li>
+                <li><a href="javascript:void(0)">您好，@Session["UserName"]</a></li>
+                <li>@Html.ActionLink("注销", "LogOut", "Authentication")</li>
+            </ul>
+         </div>
+    </div>
+</div>
+    <hr />
+    <div class="col-md-12">
+        @*<div style="float: left; width: 20%" class="Menu">*@
+        <div class="col-md-2">
+                <nav class="navbar navbar-inverse" style="background-color:white;border:none;">
+                    @*设置反白，这样底色会是黑色*@
+                    <div class="navbar-collapse">
+                        @*它是说在视口的宽度小于 768px 的时候，将导航变成垂直方向*@
+                        <ul class="nav nav-pills nav-stacked" style="list-style: none; text-align: center; font-size: 20px;">
+                            <li>@Html.ActionLink("员工管理", "Index", "Employee")</li>
+                            <li>@Html.ActionLink("部门管理", "Index", "Department")</li>
+                        </ul>
+                    </div>
+                </nav>
+        </div>
+        
+        <div class="col-md-10">
+                @RenderSection("ContentBody")
+        </div>
+    </div>
+    <div style ="clear: both">
+        @Html.Partial("Footer" , Model.FooterData)
+    </div>
+</body>
+</html>

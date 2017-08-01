@@ -1,0 +1,154 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>View</title>
+    
+    <script type="text/javascript">
+    $(function() {
+        ////搜索
+        //var to = false;
+        //$("#demo_q").keyup(function() {
+        //    if (to) {
+        //        clearTimeout(to);
+        //    }
+        //    to = setTimeout(function() {
+        //            var v = $("#demo_q").val();
+        //            $("#jstree").jstree(true).search(v);
+        //        },
+        //        250);
+        //});
+
+        $("#jstree").jstree({
+            "core": {
+                "multiple": false,
+                "animation": 0,
+                //"check_callback": true,
+                //"force_text": true,
+                "themes": { "stripes": true },
+                "data": {
+                    "url": "/Department/TreeList",
+                    "datatype": "json",
+                    "data": function(node) {
+                        alert(JSON.stringify(node));
+                        return { "id": node.id === "#" ? "0" : node.id };
+                    },
+                    success: function(data) {
+                        alert(JSON.stringify(data));
+                    }
+                }
+            }
+            //"types": {
+            //    "#": { "max_children": 1, "max_depth": 4, "valid_children": ["root"] },
+            //    "root": {
+            //        //"icon": "/static/3.3.4/assets/images/tree_icon.png",
+            //        "valid_children": ["default"]
+            //    },
+            //    "default": { "valid_children": ["default", "file"] },
+            //    "file": { "icon": "glyphicon glyphicon-file", "valid_children": [] }
+            //},
+            //"plugins": ["contextmenu", "dnd", "search", "state", "types", "wholerow"]
+        });
+
+        // 展开节点
+        $("#jstree").on("loaded.jstree", function (event, data) {
+            // 展开所有节点
+            //$(‘#jstree‘).jstree(‘open_all‘);
+            //data.instance.open_node([1, 10]); // 多个节点 (展开多个几点只有在一次性装载后所有节点后才可行）
+            // 展开指定节点
+            data.instance.open_node(data.node.id);     // 单个节点 （1 是顶层的id）
+
+        });
+
+        ////新增
+        //function demo_create() {
+        //    var ref = $("#jstree").jstree(true),
+        //        sel = ref.get_selected();
+        //    if (!sel.length) {
+        //        return false;
+        //    }
+        //    sel = sel[0];
+        //    sel = ref.create_node(sel, { "type": "file" });
+        //    if (sel) {
+        //        ref.edit(sel);
+        //    }
+        //};
+
+        ////重命名
+        //function demo_rename() {
+        //    var ref = $("#jstree_demo").jstree(true),
+        //        sel = ref.get_selected();
+        //    if (!sel.length) {
+        //        return false;
+        //    }
+        //    sel = sel[0];
+        //    ref.edit(sel);
+        //};
+
+        ////删除
+        //function demo_delete() {
+        //    var ref = $("#jstree_demo").jstree(true),
+        //        sel = ref.get_selected();
+        //    if (!sel.length) {
+        //        return false;
+        //    }
+        //    ref.delete_node(sel);
+        //};
+        </script>
+
+    <script type="text/javascript">
+        (function () {
+            $("#myTree").jstree({
+                'core': {
+                    data: {
+                        'url': '/mpa/PrivateFolder/GetFolder',
+                        'data': function (node) {
+                            return { 'id': node.id };
+                        },
+                        "success": function (data) {
+                                
+                            folderTree.setUnitCount(data.length);
+                            return data;
+                        }
+                    },
+                    multiple: false,
+                    check_callback: function (operation, node, node_parent, node_position, more) {
+                        return true;
+                    }
+                },
+                types: {
+                    "default": {
+                        "icon": "fa fa-folder tree-item-icon-color icon-lg"
+                    },
+                    "file": {
+                        "icon": "fa fa-file tree-item-icon-color icon-lg"
+                    }
+                },
+                plugins: [
+                    'types',
+                    'wholerow',
+                    'json_data'
+                ]
+            }).on('changed.jstree', function (e, data) {
+                if (data.selected.length != 1) {
+                    folderTree.selectedFolder.set(null);
+                } else {
+                    var selectedNode = data.instance.get_node(data.selected[0]);
+                       
+                }
+            });
+        })();
+        </script>
+
+</head>
+<body>
+    <div> 
+    </div>
+</body>
+</html>
